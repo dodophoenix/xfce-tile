@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 # coding: utf8
+#
+# Copyright 2018 B.Jacob
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
 import argparse
 import gtk
 import json
@@ -9,16 +18,15 @@ from argparse import RawTextHelpFormatter
 
 storageFile="/tmp/pywin.json"
 
-choices = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw','maximize']
+choices = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'center']
 
-# correcting miscalculations this might be related to decorations of the window-manager
-#
+# correcting miss-calculations this might be related to decorations of the window-manager
 correctY = -32
 correctX = -2
 correctW = 0
 correctH = 0
 
-# defines the screens and their positions. TODO: read them from somewhere from system
+# Adjust here and define the screens and their positions. TODO: read them from somewhere from system
 screens = [
   {"name": "screen1", "x": 0, "y": 0, "width": 2560, "height": 1440},
   {"name": "screen2", "x": 2560, "y": 0, "width": 2560, "height": 1440},
@@ -35,22 +43,22 @@ def findBounds(x, y):
 
 
 def read_args():
-  parser = argparse.ArgumentParser(description='Window-Placement', formatter_class=RawTextHelpFormatter)
+  parser = argparse.ArgumentParser(description='Window-Placement/Window-tiling', formatter_class=RawTextHelpFormatter)
   parser.add_argument('-p', '--pos', dest='position', metavar="position", required=True, choices=choices,
-                      help='Position. Gemäß Himmelsrichtungen n=north ne=Northeast usw. Eine Position aus:'+
+                      help='Direction to place window. Using abbreviations for directions like n=north ne=northeast and so on. Use one of:'+
                            (','.join(choices)))
 
   parser.add_argument('-f', '--factor', dest='factor', metavar="factor", type=int,default=2,
-                      help='Skalierungsfaktor (halbierung 2, drittelung 3).')
+                      help='default scale factor ')
 
   parser.add_argument('-s', '--stateful', dest='stateful', action='store_true',
-                      help='Erinnert sich an Fenstergößen und erlaubt mehr Magic')
+                      help='remember window sizing by storing some data under in: '+ storageFile)
 
   parser.add_argument('-v', '--verbose', dest='verbose', action='store_true',
-                      help='some more output ')
+                      help='print some debugging output')
 
-  parser.add_argument('-m', '--my-factors', dest='myfactor', metavar="position", default="1,1.5,2,3",
-                      help='Comma delimited list of scalefactors to use. requires stateful option')
+  parser.add_argument('-m', '--my-factors', dest='myfactor', metavar="scale-factors", default="1,1.5,2,3",
+                      help='Comma delimited list of scale-factors to use. e.g. \"1,1.5,2,3\" This requires stateful option to work.')
 
   args = parser.parse_args()
   return args
@@ -107,7 +115,7 @@ def calcNewPos(screen,position, factor):
     width = screen["width"] / factor
     height = screen["height"] / factor
 
-  if position == 'maximize':
+  if position == 'center':
     #active.maximize()
     #sys.exit(0)
     #gravity = wnck.WINDOW_GRAVITY_CENTER
