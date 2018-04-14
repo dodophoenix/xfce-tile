@@ -26,7 +26,7 @@ optional arguments:
                         like n=north ne=northeast and so on. Use one of:n,ne,e,se,s,sw,w,nw,center
   -f factor, --factor factor
                         default scale factor 
-  -s, --stateful        remember window sizing by storing some data under in: /tmp/pywin.json
+  -s, --stateful        remember window sizing by storing some data under: /tmp/pywin.json
   
   -v, --verbose         print some debugging output
   
