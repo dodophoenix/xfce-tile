@@ -165,9 +165,7 @@ if verbose:
 if(stateful):
   if verbose:
     print "read scale factor from file" + storageFile
-  # gespeicherte daten lesen
-  # aktuellen skaölierungs faktor raussuchen
-  # neuen faktor berechnen
+  
   data =  {}
   if os.path.isfile(storageFile):
     with open(storageFile) as json_data:
