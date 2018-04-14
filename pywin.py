@@ -52,7 +52,7 @@ def read_args():
                       help='default scale factor ')
 
   parser.add_argument('-s', '--stateful', dest='stateful', action='store_true',
-                      help='remember window sizing by storing some data under in: '+ storageFile)
+                      help='remember window sizing by storing some data under: '+ storageFile)
 
   parser.add_argument('-v', '--verbose', dest='verbose', action='store_true',
                       help='print some debugging output')
