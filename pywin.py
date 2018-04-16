@@ -26,10 +26,6 @@ correctX = -2
 correctW = 0
 correctH = 0
 
-#if more than the ration are displayed on a screen window is seen to belong to this screen
-# (min 0.1, max = 1.0)
-same_screen_ratio=0.75
-
 # Adjust here and define the screens and their positions. TODO: read them from somewhere from system
 screens = [
   {"name": "screen1", "x": 0, "y": 0, "width": 2560, "height": 1440},
@@ -38,29 +34,50 @@ screens = [
 ]
 
 
-def findBounds(x, y, width, height):
-  print "x:" + str(x) + " y:" + str(y)
-  for screen in screens:
+def boxIntersects(leftA, topA, rightA, bottomA, leftB, topB, rightB, bottomB):
 
-    x = max(x, screen['x'])
-    y = max(y, screen['y'])
-    x2 = min(x + screen['width'],  screen['x'] + screen['width'])
-    y2 = min(x + screen['height'], screen['y'] + screen['height'])
+  return not(leftA > rightB or
+    rightA < leftB or
+    topA > bottomB or
+    bottomA < topB)
+
+
+def findBounds(x, y, width, height):
+  if verbose:
+    print "Find best matching screen for window:"
+
+  bestMatch = screens[0] # always use a default
+  match = -1000
+  for screen in screens:
+    # screens without intersections must not be relevant here 
+    if not boxIntersects(x, y , x+width, y+height, screen['x'], screen['y'], screen['x'] + screen['width'], screen['y'] + screen['height']):
+      if verbose:
+        print " No intersection with: " + str(screen["name"])
+      continue
+
+
+    x1 = max(x, screen['x'])
+    y1 = max(y, screen['y'])
+    x2 = min(x + width,  screen['x'] + screen['width'])
+    y2 = min(y + height, screen['y'] + screen['height'])
 
     sizeWindow = width * height 
-    sizeOnScreen = (x2-x) * (y2-y)
+    sizeOnScreen = (x2-x1) * (y2-y1)
+    percentOnScreen = sizeOnScreen*100/sizeWindow
 
-    if sizeOnScreen > (sizeWindow * same_screen_ratio):
-      if verbose: 
-        print "Window belongs to screen " + str(screen["name"])
-      # most parts of the window 
-      return screen
+    if verbose: 
+        print " " + str(percentOnScreen) + "% are on: " + str(screen["name"])
 
-    #if x >= (screen['x']) and x < (screen['x'] + screen['width']) and y >= (screen['y']) and y < (screen['y'] + screen['height']):
-    #  return screen
-  
+    if match < percentOnScreen:
+      # a window belongs to the screen that renders most parts of it 
+      match = percentOnScreen
+      bestMatch = screen
+
   # always return screen 1
-  return screens[0]
+  if verbose:
+    print " Using: " + str(bestMatch["name"]) + " as best match"
+
+  return bestMatch
 
 
 def read_args():
@@ -175,17 +192,13 @@ active = screen.get_active_window()
 currentPos = (winX, winY, winW, winH) = active.get_geometry()
 
 
-# rauskriegen auf welchem screen das Fenster positioniert werden soll
+# find out the screen the active window lives on
 screen = findBounds(max(0, winX), max(0, winY), winW, winH)
-
-if verbose:
-  print "current window lives on scree " + str(screen["name"]) + " defined as:"+ str(screen)
-
 
 
 if(stateful):
   if verbose:
-    print "read scale factor from file" + storageFile
+    print "Decide next scale factor" + storageFile
   
   data =  {}
   if os.path.isfile(storageFile):
@@ -208,12 +221,12 @@ if(stateful):
   # and now lookup the next factor
   newFactor = factors[idx]
   if verbose:
-    print "next scale-factor for window with id " + str(id) + " is:" + str(newFactor)
+    print " Next scale-factor for window with id:" + str(id) + " is:" + str(newFactor)
   # and remember the factor
   data[str(id)] = str(newFactor)
   # store info
   if verbose:
-    print "write state to file:  " + str(storageFile)
+    print " Write state to file:  " + str(storageFile)
 
   with open(storageFile, 'w') as outfile:
     json.dump(data, outfile)
@@ -228,7 +241,7 @@ flags = wnck.WINDOW_CHANGE_X | wnck.WINDOW_CHANGE_Y | wnck.WINDOW_CHANGE_WIDTH |
 active.unmaximize()
 
 if verbose:
-  print "activate new size " + str(newPos) + " also adding additionals"
+  print "new size " + str(newPos)
 
 
 # only apply the corrections if the window has window decorations 
