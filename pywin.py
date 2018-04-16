@@ -20,11 +20,15 @@ storageFile="/tmp/pywin.json"
 
 choices = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'center']
 
-# correcting miss-calculations this might be related to decorations of the window-manager
+# correcting miss-calculations this might be related to decorations of the window-manager read from somwhere in system
 correctY = -32
 correctX = -2
 correctW = 0
 correctH = 0
+
+#if more than the ration are displayed on a screen window is seen to belong to this screen
+# (min 0.1, max = 1.0)
+same_screen_ratio=0.75
 
 # Adjust here and define the screens and their positions. TODO: read them from somewhere from system
 screens = [
@@ -34,12 +38,29 @@ screens = [
 ]
 
 
-def findBounds(x, y):
+def findBounds(x, y, width, height):
   print "x:" + str(x) + " y:" + str(y)
   for screen in screens:
-    if x >= screen['x'] and x < (screen['x'] + screen['width']) and y >= screen['y'] and y < (screen['y'] + screen['height']):
+
+    x = max(x, screen['x'])
+    y = max(y, screen['y'])
+    x2 = min(x + screen['width'],  screen['x'] + screen['width'])
+    y2 = min(x + screen['height'], screen['y'] + screen['height'])
+
+    sizeWindow = width * height 
+    sizeOnScreen = (x2-x) * (y2-y)
+
+    if sizeOnScreen > (sizeWindow * same_screen_ratio):
+      if verbose: 
+        print "Window belongs to screen " + str(screen["name"])
+      # most parts of the window 
       return screen
-  return None
+
+    #if x >= (screen['x']) and x < (screen['x'] + screen['width']) and y >= (screen['y']) and y < (screen['y'] + screen['height']):
+    #  return screen
+  
+  # always return screen 1
+  return screens[0]
 
 
 def read_args():
@@ -155,7 +176,7 @@ currentPos = (winX, winY, winW, winH) = active.get_geometry()
 
 
 # rauskriegen auf welchem screen das Fenster positioniert werden soll
-screen = findBounds(max(0, winX), max(0, winY))
+screen = findBounds(max(0, winX), max(0, winY), winW, winH)
 
 if verbose:
   print "current window lives on scree " + str(screen["name"]) + " defined as:"+ str(screen)
