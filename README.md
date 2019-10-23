@@ -4,7 +4,7 @@ placement / tile xfce windows using dynamic grid
 
 # getting started 
 
-* download the script
+* checkout or download the script
 * install required python3 and GObject module for pythn  
 ```
 # ubuntu
@@ -13,7 +13,9 @@ apt-get install python3-gi
 pacman -S python-gobject
 ```  
 
-* add keyboard shortcuts to xfce using the  `xfce-setup-shortcuts.sh` or adding them manually. e.g..
+* add keyboard shortcuts to xfce using the  `xfce-setup-shortcuts.sh` to use ALT + Numpad as shortcuts. 
+You may add any combination using xfce4-keyboard-settings .
+
 ```
     Alt + Num - 4 > pywin.py --position w --stateful 
 ```
