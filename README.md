@@ -41,7 +41,3 @@ optional arguments:
   -m scale-factors, --my-factors scale-factors
                         Comma delimited list of scale-factors to use. e.g. "1,1.5,2,3" 
                         This requires stateful option to work.
-
-
-
- 
