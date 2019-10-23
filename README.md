@@ -5,15 +5,21 @@ placement / tile xfce windows using dynamic grid
 # getting started 
 
 * download the script
-* edit screens on top of the file
-* add keyboard shortcuts to xfce e.g.: 
+* install required python3 and GObject module for pythn  
+```
+# ubuntu
+apt-get install python3-gi
+# arch 
+pacman -S python-gobject
+```  
 
+* add keyboard shortcuts to xfce using the  `xfce-setup-shortcuts.sh` or adding them manually. e.g..
 ```
     Alt + Num - 4 > pywin.py --position w --stateful 
 ```
 
-# usage
 
+# usage
 ```
 usage: pywin.py [-h] -p position [-f factor] [-s] [-v] [-m scale-factors]
 
@@ -33,3 +39,7 @@ optional arguments:
   -m scale-factors, --my-factors scale-factors
                         Comma delimited list of scale-factors to use. e.g. "1,1.5,2,3" 
                         This requires stateful option to work.
+
+
+
+ 
