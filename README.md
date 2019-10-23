@@ -13,8 +13,9 @@ apt-get install python3-gi
 pacman -S python-gobject
 ```  
 
-* add keyboard shortcuts to xfce using the  `xfce-setup-shortcuts.sh` to use ALT + Numpad as shortcuts. 
-You may add any combination using xfce4-keyboard-settings .
+* Add keyboard shortcuts to xfce.\
+ Using the  `xfce-setup-shortcuts.sh`-script will add ALT + Numpad as shortcuts.\
+ You may add any combination using xfce4-keyboard-settings .
 
 ```
     Alt + Num - 4 > pywin.py --position w --stateful 
