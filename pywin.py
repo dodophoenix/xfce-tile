@@ -108,15 +108,19 @@ def read_args():
 
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true',
                         help='print some debugging output')
+    parser.add_argument('-o', '--horizontal', dest='hori', action='store_true',
+                        help='scale only horizontal')
+    parser.add_argument('-e', '--vertically', dest='vert', action='store_true',
+                        help='scale only vertical')
 
     parser.add_argument('-m', '--my-factors', dest='myfactor', metavar="scale-factors", default="1,1.334,1.5,2,3,4",
-                        help='Comma delimited list of scale-factors to use. e.g. \"1,1.5,2,3\" This requires stateful option to work.')
+                        help='Comma delimited list of scale-factors to use. e.g. \"1,1.5,2,3\" This requires stateful option.')
 
     args = parser.parse_args()
     return args
 
 
-def calcNewPos(screen, position, factor):
+def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=False, horizontalOnly=False ):
     gravity = Wnck.WindowGravity.NORTHWEST
     if position == 'n':
         y = screen["y"]
@@ -127,8 +131,15 @@ def calcNewPos(screen, position, factor):
     if position == 'ne':
         y = screen["y"]
         x = screen["x"] + screen["width"] - screen["width"] / factor
-        width = screen["width"] / factor
-        height = screen["height"] / factor
+        if not horizontalOnly and not verticallyOnly:
+            width = screen["width"] / factor
+            height = screen["height"] / factor
+        if horizontalOnly:
+            width = screen["width"] / factor
+            height =currentPos.heightp
+        if verticallyOnly:
+            width =  currentPos.widthp
+            height = screen["height"] / factor
 
     if position == 'e':
         y = screen["y"]
@@ -139,8 +150,17 @@ def calcNewPos(screen, position, factor):
     if position == 'se':
         y = screen["y"] + screen["height"] - screen["height"] / factor
         x = screen["x"] + screen["width"] - screen["width"] / factor
-        width = screen["width"] / factor
-        height = screen["height"] / factor
+        if not horizontalOnly and not verticallyOnly:
+            width = screen["width"] / factor
+            height = screen["height"] / factor
+        if horizontalOnly:
+            width = screen["width"] / factor
+            height =currentPos.heightp
+            y = currentPos.yp
+        if verticallyOnly:
+            x = currentPos.xp
+            width =  currentPos.widthp
+            height = screen["height"] / factor
 
     if position == 's':
         y = screen["y"] + screen["height"] - screen["height"] / factor
@@ -151,8 +171,16 @@ def calcNewPos(screen, position, factor):
     if position == 'sw':
         y = screen["y"] + screen["height"] - screen["height"] / factor
         x = screen["x"]
-        width = screen["width"] / factor
-        height = screen["height"] / factor
+        if not horizontalOnly and not verticallyOnly:
+            width = screen["width"] / factor
+            height = screen["height"] / factor
+        if horizontalOnly:
+            width = screen["width"] / factor
+            height =currentPos.heightp
+            y = currentPos.yp
+        if verticallyOnly:
+            width =  currentPos.widthp
+            height = screen["height"] / factor
 
     if position == 'w':
         y = screen["y"]
@@ -163,8 +191,16 @@ def calcNewPos(screen, position, factor):
     if position == 'nw':
         y = screen["y"]
         x = screen["x"]
-        width = screen["width"] / factor
-        height = screen["height"] / factor
+        if not horizontalOnly and not verticallyOnly:
+            width = screen["width"] / factor
+            height = screen["height"] / factor
+        if horizontalOnly:
+            width = screen["width"] / factor
+            height =currentPos.heightp
+        if verticallyOnly:
+            width =  currentPos.widthp
+            height = screen["height"] / factor
+
 
     if position == 'center':
         # active.maximize()
@@ -173,6 +209,7 @@ def calcNewPos(screen, position, factor):
         height = screen["height"]
         y = screen["y"]
         x = ((screen["x"] + (screen["width"] / 2)) - width / 2)
+
     return (x, y, width, height, gravity)
 
 
@@ -211,6 +248,20 @@ currentPos = (winX, winY, winW, winH) = active.get_geometry()
 
 # find out the screen the active window lives on
 screen = findBounds(max(0, winX), max(0, winY), winW, winH)
+
+flags = Wnck.WindowMoveResizeMask.X | \
+        Wnck.WindowMoveResizeMask.Y | \
+        Wnck.WindowMoveResizeMask.WIDTH | \
+        Wnck.WindowMoveResizeMask.HEIGHT
+active.unmaximize()
+
+#
+# Note: set_geometry position seems to works relative to current window
+#
+geometryRaw = active.get_client_window_geometry()
+if verbose:
+    print("Geometry raw:" + str(geometryRaw))
+    print("current Pos: " + str(currentPos))
 
 if (stateful):
     if verbose:
@@ -251,40 +302,21 @@ if (stateful):
         print("factor"+ str(factor))
         print(position)
         print(screen)
-    newPos = calcNewPos(screen, position, newFactor)
+    newPos = calcNewPos(screen, position, newFactor, geometryRaw,currentPos, args.vert, args.hori)
 
 
 else:
-    newPos = calcNewPos(screen, position, factor)
-
-flags = Wnck.WindowMoveResizeMask.X | \
-        Wnck.WindowMoveResizeMask.Y | \
-        Wnck.WindowMoveResizeMask.WIDTH |\
-        Wnck.WindowMoveResizeMask.HEIGHT
-active.unmaximize()
+    newPos = calcNewPos(screen, position, factor, geometryRaw,currentPos, args.vert, args.hori)
 
 if verbose:
     print("New Geometry calculated " + str(newPos))
-#
-# Note: set_geometry position seems to works relative to current window
-#
-geometryRaw = active.get_client_window_geometry()
-if verbose:
-  print("Geometry raw:" + str(geometryRaw))
-
 # find difference of window decoration and take it into the calculation
 
-
-# only apply the corrections if the window has window decorations
-gemoetryRaw = active.get_client_window_geometry()
-
-# only apply the corrections if the window has window decorations
-geometryRaw = active.get_client_window_geometry()
 
 # find difference of window decoration and use it for calculation
 correctureY = geometryRaw[1] - currentPos[1]
 correctureX = geometryRaw[0] - currentPos[0]
-
+print ("correcture y:" + str(correctureY))
 active.set_geometry(gravity=newPos[4],
                     geometry_mask=flags,
                     x=int(newPos[0] - correctureX),
