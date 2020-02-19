@@ -5,7 +5,7 @@ placement / tile xfce windows using dynamic grid
 # getting started 
 
 * checkout or download the script
-* install required python3 and GObject module for pythn  
+* install required python3 and GObject module for python  
 ```
 # ubuntu
 apt-get install python3-gi
@@ -15,10 +15,10 @@ pacman -S python-gobject
 
 * Add keyboard shortcuts to xfce.\
  Using the  `xfce-setup-shortcuts.sh`-script will add all shortcuts.\
- You may manually add shortcuts using xfce4-keyboard-settings.
-
+ You may manually add shortcuts using xfce4-keyboard-settings.\
+  e.g. Link Alt + Num -4 to the pywin command. \
 ```
-    Alt + Num - 4 > pywin.py --position w --stateful 
+    Alt + Num - 4 > python /some/path/pywin.py --position w --stateful 
 ```
 
 
