@@ -8,9 +8,9 @@ placement / tile xfce windows using dynamic grid
 * install required python3 and GObject module for python  
 ```
 # ubuntu
-apt-get install python3-gi
+apt-get install python3-gi python3-xlib
 # arch 
-pacman -S python-gobject
+pacman -S python-gobject python-xlib
 ```  
 
 * Add keyboard shortcuts to xfce.\
