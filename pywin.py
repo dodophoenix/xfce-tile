@@ -11,7 +11,7 @@
 #
 import argparse
 import gi
-
+from Xlib import X, display # python-xlib
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version("Wnck", "3.0")
@@ -32,6 +32,17 @@ autoDiscoverScreens = True
 storageFile = "/tmp/pywin.json"
 
 choices = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'center']
+
+def placeMouseOver(rect):
+    d = display.Display()
+    s = d.screen()
+    root = s.root
+    x = int(rect[0] + rect[2]/2)
+    y = int(rect[1] + rect[3]/2)
+    print("new win pos:"+str(rect))
+    print ("new x,y"+ str(x)+","+str(y))
+    root.warp_pointer(x,y)
+    d.sync()
 
 
 def discoverScreens():
@@ -112,7 +123,9 @@ def read_args():
                         help='scale only horizontal')
     parser.add_argument('-e', '--vertically', dest='vert', action='store_true',
                         help='scale only vertical')
-
+    parser.add_argument('-c', '--with-cursor', dest='mouse', action='store_true', default=False,
+                        help='place mouse cursor over moved window. Subsequent invocations should address same window'
+                             ' if system activates windows on hover')
     parser.add_argument('-m', '--my-factors', dest='myfactor', metavar="scale-factors", default="1,1.334,1.5,2,3,4",
                         help='Comma delimited list of scale-factors to use. e.g. \"1,1.5,2,3\" This requires stateful option.')
 
@@ -323,3 +336,6 @@ active.set_geometry(gravity=newPos[4],
                     y=int(newPos[1] - correctureY),
                     width=int(newPos[2]),
                     height=int(newPos[3]))
+
+if args.mouse:
+    placeMouseOver((int(newPos[0] - correctureX),int(newPos[1] - correctureY),int(newPos[2]), int(newPos[3])))
