@@ -153,6 +153,7 @@ def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=
         if verticallyOnly:
             width =  currentPos.widthp
             height = screen["height"] / factor
+            x = currentPos.xp
 
     if position == 'e':
         y = screen["y"]
@@ -329,7 +330,7 @@ if verbose:
 # find difference of window decoration and use it for calculation
 correctureY = geometryRaw[1] - currentPos[1]
 correctureX = geometryRaw[0] - currentPos[0]
-print ("correcture y:" + str(correctureY))
+
 active.set_geometry(gravity=newPos[4],
                     geometry_mask=flags,
                     x=int(newPos[0] - correctureX),
@@ -338,4 +339,7 @@ active.set_geometry(gravity=newPos[4],
                     height=int(newPos[3]))
 
 if args.mouse:
+    # keep the active window in foreground otherwise mouse might focus an other window
+    Wnck.Window.make_above(active) #- always on top on
+    Wnck.Window.unmake_above(active) #- always on top off
     placeMouseOver((int(newPos[0] - correctureX),int(newPos[1] - correctureY),int(newPos[2]), int(newPos[3])))
