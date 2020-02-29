@@ -11,9 +11,11 @@
 #
 import argparse
 import gi
-from Xlib import X, display # python-xlib
+from Xlib import X, display  # python-xlib
+
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+
 gi.require_version("Wnck", "3.0")
 from gi.repository import Wnck
 
@@ -37,11 +39,12 @@ def placeMouseOver(rect):
     d = display.Display()
     s = d.screen()
     root = s.root
-    x = int(rect[0] + rect[2]/2)
-    y = int(rect[1] + rect[3]/2)
-    print("new win pos:"+str(rect))
-    print ("new x,y"+ str(x)+","+str(y))
-    root.warp_pointer(x,y)
+    x = int(rect[0] + rect[2] / 2)
+    y = int(rect[1] + rect[3] / 2)
+    if verbose:
+        print("new win pos:" + str(rect))
+        print ("new x,y" + str(x) + "," + str(y))
+    root.warp_pointer(x, y)
     d.sync()
 
 
@@ -133,7 +136,7 @@ def read_args():
     return args
 
 
-def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=False, horizontalOnly=False ):
+def calcNewPos(screen, position, factor, geometryRaw, currentPos, verticallyOnly=False, horizontalOnly=False):
     gravity = Wnck.WindowGravity.NORTHWEST
     if position == 'n':
         y = screen["y"]
@@ -149,9 +152,9 @@ def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=
             height = screen["height"] / factor
         if horizontalOnly:
             width = screen["width"] / factor
-            height =currentPos.heightp
+            height = currentPos.heightp
         if verticallyOnly:
-            width =  currentPos.widthp
+            width = currentPos.widthp
             height = screen["height"] / factor
             x = currentPos.xp
 
@@ -169,11 +172,11 @@ def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=
             height = screen["height"] / factor
         if horizontalOnly:
             width = screen["width"] / factor
-            height =currentPos.heightp
+            height = currentPos.heightp
             y = currentPos.yp
         if verticallyOnly:
             x = currentPos.xp
-            width =  currentPos.widthp
+            width = currentPos.widthp
             height = screen["height"] / factor
 
     if position == 's':
@@ -190,10 +193,10 @@ def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=
             height = screen["height"] / factor
         if horizontalOnly:
             width = screen["width"] / factor
-            height =currentPos.heightp
+            height = currentPos.heightp
             y = currentPos.yp
         if verticallyOnly:
-            width =  currentPos.widthp
+            width = currentPos.widthp
             height = screen["height"] / factor
 
     if position == 'w':
@@ -210,11 +213,10 @@ def calcNewPos(screen, position, factor, geometryRaw,currentPos, verticallyOnly=
             height = screen["height"] / factor
         if horizontalOnly:
             width = screen["width"] / factor
-            height =currentPos.heightp
+            height = currentPos.heightp
         if verticallyOnly:
-            width =  currentPos.widthp
+            width = currentPos.widthp
             height = screen["height"] / factor
-
 
     if position == 'center':
         # active.maximize()
@@ -313,14 +315,14 @@ if (stateful):
         json.dump(data, outfile)
 
     if verbose:
-        print("factor"+ str(factor))
+        print("factor" + str(factor))
         print(position)
         print(screen)
-    newPos = calcNewPos(screen, position, newFactor, geometryRaw,currentPos, args.vert, args.hori)
+    newPos = calcNewPos(screen, position, newFactor, geometryRaw, currentPos, args.vert, args.hori)
 
 
 else:
-    newPos = calcNewPos(screen, position, factor, geometryRaw,currentPos, args.vert, args.hori)
+    newPos = calcNewPos(screen, position, factor, geometryRaw, currentPos, args.vert, args.hori)
 
 if verbose:
     print("New Geometry calculated " + str(newPos))
@@ -340,6 +342,6 @@ active.set_geometry(gravity=newPos[4],
 
 if args.mouse:
     # keep the active window in foreground otherwise mouse might focus an other window
-    Wnck.Window.make_above(active) #- always on top on
-    Wnck.Window.unmake_above(active) #- always on top off
-    placeMouseOver((int(newPos[0] - correctureX),int(newPos[1] - correctureY),int(newPos[2]), int(newPos[3])))
+    Wnck.Window.make_above(active)  # - always on top on
+    Wnck.Window.unmake_above(active)  # - always on top off
+    placeMouseOver((int(newPos[0] - correctureX), int(newPos[1] - correctureY), int(newPos[2]), int(newPos[3])))
