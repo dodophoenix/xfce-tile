@@ -114,7 +114,7 @@ def read_args():
                         help='Direction to place window. Using abbreviations for directions like n=north ne=northeast and so on. Use one of:' +
                              (','.join(choices)))
 
-    parser.add_argument('-f', '--factor', dest='factor', metavar="factor", type=int, default=2,
+    parser.add_argument('-f', '--factor', dest='factor', metavar="factor", type=float, default=1.5,
                         help='default scale factor ')
 
     parser.add_argument('-s', '--stateful', dest='stateful', action='store_true',
